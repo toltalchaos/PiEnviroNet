@@ -1,0 +1,27 @@
+from flask import Flask, request, jsonify
+from .init_db import *
+app= Flask(__name__)
+
+
+@app.route("/")
+def hello_world():
+    return '<h1> Hello World! </h1>'
+
+@app.route("/light-reading", methods=["POST"])
+def recieve_reading():
+# print out payload
+    data = request.json
+    print(data)
+    insert_record(data.get('reading'))
+    if not data:
+        return "invalid", 400
+    return "recieved", 200
+
+@app.route("/review")
+def review():
+    readings = retrieve_readings()
+    return jsonify(readings)
+    
+
+if __name__ == '__main__':
+    app.run(debug=True)
