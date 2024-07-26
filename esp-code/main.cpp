@@ -24,7 +24,7 @@ const int MINIMUM_LIGHT_THRESHOLD = 800;
 void evaluateLight();
 void itsDarkInHere(int readingValue);
 void lightHasHappened();
-void sendReading(int readingValue);
+void sendReading(Srting readingType, int readingValue);
 
 void setup() {
   // put your setup code here, to run once:
