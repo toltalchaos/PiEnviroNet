@@ -35,4 +35,8 @@ def retrieve_readings(reading_type=None):
     curs.close()
     connection.close()
 
+#    columns = [desc[0] for desc in curs.description]
+#     readings = [dict(zip(columns, row)) for row in readings]
+#     return json.dumps(readings)
+
     return readings
