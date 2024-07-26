@@ -21,6 +21,7 @@ int ledOut = 26; //IO26 -> out 26
 
 const int MINIMUM_LIGHT_THRESHOLD = 800;
 
+void evaluateLight();
 void itsDarkInHere(int readingValue);
 void lightHasHappened();
 void sendReading(int readingValue);
@@ -48,38 +49,54 @@ void setup() {
 }
 
 void loop() {
+  delay(1000);//slow things down a bit
+
+  evaluateLight();
+}
 
 
-  // put your main code here, to run repeatedly:
-  int LightSensorAnalgoValue = analogRead(lightSensor);
-  Serial.printf("sensor analog value = %d \n", LightSensorAnalgoValue);
+//light reading functions
+void evaluateLight(){
+  int iteration = 0;
+  array<int, 10> readings;
+  do{
+  int LightSensorAnalgValue = analogRead(lightSensor);
+  readings[iteration] = LightSensorAnalgValue;
+  iteration++;
+  delay(30);
+  }while(iteration < 10);
 
-  if(LightSensorAnalgoValue >= MINIMUM_LIGHT_THRESHOLD){
-    itsDarkInHere(LightSensorAnalgoValue);
+  int averageLightValue = 0;
+  for(int i = 0; i < 10; i++){
+    averageLightValue += readings[i];
+  }
+  averageLightValue = averageLightValue / 10;
+  Serial.println("Light Value: " + averageLightValue);
+  if( averageLightValue >= MINIMUM_LIGHT_THRESHOLD){
+    itsDarkInHere(averageLightValue);
   }
   else{
     lightHasHappened();
   }
-
-
-  delay(1000);//slow things down a bit
 }
 
 void itsDarkInHere(int readingValue){
     Serial.println("its dark in here");
     digitalWrite(ledOut, HIGH); //change the voltage level
-    sendReading(readingValue);
+    sendReading("light", readingValue);
 }
 
 void lightHasHappened(){
       digitalWrite(ledOut, LOW); //turn the pin off
-
 }
 
-void sendReading(int readingValue){
-  StaticJsonDocument<200> doc;
+
+//send reading to server
+void sendReading(String readingType, int readingValue){
+  StaticJsonDocument<500> doc;
   doc["reading"] = readingValue;
-  char jsonString[200];
+  doc["readingType"] = readingType;
+  char jsonString[500];
   serializeJson(doc, jsonString);
 
   http.begin(HOST_NAME + PATH_NAME);

@@ -1,18 +1,19 @@
 import psycopg2
 import datetime
 
-
-
-def insert_record(record):
-    connection = psycopg2.connect(
+def get_connection():
+    return psycopg2.connect(
     host='localhost',
     database='environmentdb',
     user= 'app_user',
     password= 'testing'
 )
+
+def insert_record(reading, reading_type):
+    connection = get_connection()
     curs = connection.cursor()
 
-    curs.execute(f"INSERT INTO reading VALUES('{str(datetime.datetime.now())}', '{record}')")
+    curs.execute(f"INSERT INTO reading (time, reading_type, reading) VALUES('{str(datetime.datetime.now())}','{reading_type}', '{reading}')")
 
     connection.commit()
 
@@ -20,12 +21,8 @@ def insert_record(record):
     connection.close()
 
 def retrieve_readings():
-    connection = psycopg2.connect(
-    host='localhost',
-    database='environmentdb',
-    user= 'app_user',
-    password= 'testing'
-)
+    connection = get_connection()
+
     curs = connection.cursor()
     curs.execute(f"SELECT * FROM reading")
 

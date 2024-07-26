@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from .init_db import *
+from .db_functions import *
 app= Flask(__name__)
 
 
@@ -12,7 +12,7 @@ def recieve_reading():
 # print out payload
     data = request.json
     print(data)
-    insert_record(data.get('reading'))
+    insert_record(data.get('reading'), data.get('readingType'))
     if not data:
         return "invalid", 400
     return "recieved", 200
