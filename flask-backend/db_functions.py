@@ -20,11 +20,15 @@ def insert_record(reading, reading_type):
     curs.close()
     connection.close()
 
-def retrieve_readings():
+def retrieve_readings(reading_type=None):
     connection = get_connection()
 
-    curs = connection.cursor()
-    curs.execute(f"SELECT * FROM reading")
+    if reading_type:
+        curs = connection.cursor()
+        curs.execute(f"SELECT * FROM reading WHERE reading_type = '{reading_type}'")
+    else:
+        curs = connection.cursor()
+        curs.execute(f"SELECT * FROM reading")
 
     readings = curs.fetchall()
 

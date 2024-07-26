@@ -21,6 +21,11 @@ def recieve_reading():
 def review():
     readings = retrieve_readings()
     return jsonify(readings)
+
+@app.route("/review/<reading_type>")
+def review_type(reading_type):
+    readings = retrieve_readings(reading_type)
+    return jsonify(readings)
     
 
 if __name__ == '__main__':
