@@ -7,14 +7,13 @@
 const String SENSOR_MODULE_NAME = "some_name"; // NAME THIS, all readings FROM this device will be tied to this device.
 
 // wifi settings
-const char WIFI_NAME[] = "Network Name";
-const char WIFI_PASSWORD[] = "vjpz8446";
-
-// const char WIFI_NAME[] = "TELUS0420";
-// const char WIFI_PASSWORD[] = "t3hypycj5n";
+// const char WIFI_NAME[] = "Network Name";
+// const char WIFI_PASSWORD[] = "vjpz8446";
+const char WIFI_NAME[] = "TELUSWiFi3462";
+const char WIFI_PASSWORD[] = "7M8B7zdVH7";
 
 // server connection settings
-String HOST_NAME = "http://192.168.102.206:8080";
+String HOST_NAME = "http://192.168.1.81:8080"; // unless this is pinned it will likely change
 String READING_PATH_NAME = "/reading";
 String HARDWARE_PATH_NAME = "/standup-hardware";
 
@@ -29,11 +28,10 @@ const String SENSOR_LIST[] = {"light"};//currently only have a light sensor
 int lightSensor = 35; // i35 -> In 35
 int ledOut = 2;       // IO2 -> pin2 (onboard LED)
 
-const int MINIMUM_LIGHT_THRESHOLD = 1000;
+const int MINIMUM_LIGHT_THRESHOLD = 300;
 
 void sendHardwarePayload();
 void evaluateLight();
-void lightHasHappened();
 void sendReading(String readingType, String readingValue);
 void evaluateHttpResponse(int httpCode);
 
@@ -53,7 +51,7 @@ void setup() {
 
   //ensure we are assigned an IP
   Serial.println("ESP32 IP address: ");
-Serial.println(WiFi.localIP());
+  Serial.println(WiFi.localIP());
 
   // try a GET on test
   http.begin(HOST_NAME + "/test");
