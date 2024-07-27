@@ -13,16 +13,6 @@ def insert_record(reading, reading_type, hardware_name):
     connection = get_connection()  # Ensure this function returns a valid connection object
     curs = connection.cursor()
 
-    # # Check if the reading_type exists in the sensor table
-    # curs.execute("SELECT COUNT(*) FROM sensor WHERE reading_type = %s", (reading_type,))
-    # if curs.fetchone()[0] == 0:
-    #     raise ValueError(f"Invalid reading_type: {reading_type} does not exist in sensor table")
-
-    # # Check if the hardware_name exists in the hardware table
-    # curs.execute("SELECT COUNT(*) FROM hardware WHERE hardware_type = %s", (hardware_name,))
-    # if curs.fetchone()[0] == 0:
-    #     raise ValueError(f"Invalid hardware_name: {hardware_name} does not exist in hardware table")
-
     # Insert the record into the reading table
     query = """
     INSERT INTO reading (time, sensor_type, hardware, reading)
