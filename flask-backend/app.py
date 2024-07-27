@@ -5,16 +5,17 @@ from .db_functions import *
 app= Flask(__name__)
 CORS(app)
 
-@app.before_request
-def log_request_info():
-    print('Headers: %s', request.headers)
-    print('Body: %s', request.get_data())
+## the following to REALLY log out incoming payloads to the server
+# @app.before_request
+# def log_request_info():
+#     print('Headers: %s', request.headers)
+#     print('Body: %s', request.get_data())
 
 
 
 @app.route("/")
 def hello_world():
-    return '<h1> Hello World! </h1>'
+    return '<h1> Welcome to the API! </h1>'
 
 
 @app.route('/test', methods=['GET'])
