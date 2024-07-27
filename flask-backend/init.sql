@@ -1,17 +1,37 @@
 -- Create the database
-CREATE DATABASE environmentdb;
+-- CREATE DATABASE environmentdb;
 
--- Create the user
-CREATE USER app_user WITH PASSWORD 'testing';
+-- -- Create the user
+-- CREATE USER app_user WITH PASSWORD 'testing';
 
--- Grant privileges to the user on the database
-GRANT ALL PRIVILEGES ON DATABASE environmentdb TO app_user;
+-- -- Grant privileges to the user on the database
+-- GRANT ALL PRIVILEGES ON DATABASE environmentdb TO app_user;
 
--- Connect to the database
-\c environmentdb;
+-- -- Connect to the database
+-- \connect environmentdb;
 
--- Create the table
-CREATE TABLE reading ( time VARCHAR(255), reading_type VARCHAR(255), reading VARCHAR(255) );
+-- Create the tables
+CREATE TABLE sensor (
+    sensor_id SERIAL PRIMARY KEY,  -- Primary key for the sensor table
+    sensor_type VARCHAR(255) UNIQUE NOT NULL  -- Column to be referenced by foreign key
+);
 
--- Insert some data
--- INSERT INTO reading (time, reading_type, reading) VALUES ('2020-01-01 00:00:00', 'temperature', '20');
+
+CREATE TABLE hardware (
+    hardware_id SERIAL PRIMARY KEY,  -- Primary key for the hardware table
+    hardware_name VARCHAR(255) UNIQUE NOT NULL  -- Column to be referenced by foreign key
+);
+
+
+CREATE TABLE reading (
+    reading_id SERIAL PRIMARY KEY,  -- Primary key for the reading table
+    time TIMESTAMP NOT NULL,  -- Assuming time is a timestamp
+    sensor_type VARCHAR(255) NOT NULL,
+    hardware VARCHAR(255) NOT NULL,
+    reading VARCHAR(255) NOT NULL,
+
+    CONSTRAINT fk_sensor_type FOREIGN KEY (sensor_type) REFERENCES sensor (sensor_type),
+    CONSTRAINT fk_hardware FOREIGN KEY (hardware) REFERENCES hardware (hardware_name)
+);
+
+

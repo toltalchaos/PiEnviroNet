@@ -2,105 +2,158 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
+#include <array>
 
-//wifi settings
+const String SENSOR_MODULE_NAME = "some_name";
+
+// wifi settings
 const char WIFI_NAME[] = "Network Name";
 const char WIFI_PASSWORD[] = "vjpz8446";
 
-//server connection settings
+// server connection settings
 String HOST_NAME = "http://192.168.102.206:5000";
-String PATH_NAME = "/light-reading";
+String READING_PATH_NAME = "/reading";
+String HARDWARE_PATH_NAME = "/standup-hardware";
 
-
-//new http client
+// new http client
 HTTPClient http;
 
-//pin declarations
-int lightSensor = 35; //i35 -> In 35
-int ledOut = 26; //IO26 -> out 26
+// const String SENSOR_LIST[] = {"light", "humidity", "pressure", "temperature"};
+
+const String SENSOR_LIST[] = {"light"};
+
+// pin declarations
+int lightSensor = 35; // i35 -> In 35
+int ledOut = 2;       // IO2 -> pin2 (onboard LED)
 
 const int MINIMUM_LIGHT_THRESHOLD = 800;
 
+void setupHardware();
+void sendHardwarePayload();
 void evaluateLight();
 void itsDarkInHere(int readingValue);
 void lightHasHappened();
-void sendReading(Srting readingType, int readingValue);
+void sendReading(String readingType, int readingValue);
 
-void setup() {
+void setup()
+{
   // put your setup code here, to run once:
-  Serial.begin(115200); //repeat speed
-  pinMode(ledOut, OUTPUT); //set the IO pin as an output otherwise it will just recieve power
+  Serial.begin(115200);      // repeat speed
+  pinMode(ledOut, OUTPUT);   // set the IO pin as an output otherwise it will just recieve power
+  digitalWrite(ledOut, LOW); // turn the pin off
 
-//connect to wifi the server is hosted on
+  // connect to wifi the server is hosted on
   WiFi.begin(WIFI_NAME, WIFI_PASSWORD);
   Serial.println("CONNECTING....");
-  while(WiFi.status()!= WL_CONNECTED){
+  while (WiFi.status() != WL_CONNECTED)
+  {
     delay(500);
     Serial.print('.');
   }
   Serial.println("CONNECTED!!! local IP: " + WiFi.localIP());
 
- 
   // try a GET on the root
   http.begin(HOST_NAME);
   int httpCode = http.GET();
   Serial.println(HOST_NAME + " resulted in : " + httpCode);
   http.end();
+  setupHardware();
+  digitalWrite(ledOut, HIGH);
 }
 
-void loop() {
-  delay(1000);//slow things down a bit
+// ensure the hardware is setup as all configuration should be done here
+void setupHardware()
+{
+  // Your hardware setup code here
 
-  evaluateLight();
+  // Send hardware setup payload
+  sendHardwarePayload();
 }
 
-
-//light reading functions
-void evaluateLight(){
-  int iteration = 0;
-  array<int, 10> readings;
-  do{
-  int LightSensorAnalgValue = analogRead(lightSensor);
-  readings[iteration] = LightSensorAnalgValue;
-  iteration++;
-  delay(30);
-  }while(iteration < 10);
-
-  int averageLightValue = 0;
-  for(int i = 0; i < 10; i++){
-    averageLightValue += readings[i];
-  }
-  averageLightValue = averageLightValue / 10;
-  Serial.println("Light Value: " + averageLightValue);
-  if( averageLightValue >= MINIMUM_LIGHT_THRESHOLD){
-    itsDarkInHere(averageLightValue);
-  }
-  else{
-    lightHasHappened();
-  }
-}
-
-void itsDarkInHere(int readingValue){
-    Serial.println("its dark in here");
-    digitalWrite(ledOut, HIGH); //change the voltage level
-    sendReading("light", readingValue);
-}
-
-void lightHasHappened(){
-      digitalWrite(ledOut, LOW); //turn the pin off
-}
-
-
-//send reading to server
-void sendReading(String readingType, int readingValue){
+void sendHardwarePayload()
+{
   StaticJsonDocument<500> doc;
-  doc["reading"] = readingValue;
-  doc["readingType"] = readingType;
+  doc["hardwareName"] = SENSOR_MODULE_NAME;
+  JsonArray sensorTypes = doc.createNestedArray("sensorType");
+
+  for (const String &sensor : SENSOR_LIST)
+  {
+    sensorTypes.add(sensor);
+  }
+
   char jsonString[500];
   serializeJson(doc, jsonString);
 
-  http.begin(HOST_NAME + PATH_NAME);
+  HTTPClient http;
+  http.begin(HOST_NAME + HARDWARE_PATH_NAME);
   http.addHeader("Content-Type", "application/json");
   int httpCode = http.POST(jsonString);
+
+  if (httpCode > 0)
+  {
+    String payload = http.getString();
+    Serial.println("HTTP Response code: " + String(httpCode));
+    Serial.println("Response payload: " + payload);
+  }
+  else
+  {
+    Serial.println("Error on HTTP request");
+    Serial.println("Response payload: " + http.getString());
+  }
+
+  http.end();
+}
+
+// THIS IS THE MAIN LOOP
+void loop()
+{
+  digitalWrite(ledOut, HIGH);
+  delay(1000); // slow things down a bit
+  evaluateLight();
+  digitalWrite(ledOut, LOW); // turn the pin off
+  delay(1000);               // slow things down a bit
+}
+
+// light reading functions
+void evaluateLight()
+{
+  int LightSensorAnalgValue = analogRead(lightSensor);
+  Serial.printf("Light Value: %d \n", LightSensorAnalgValue);
+
+  if (LightSensorAnalgValue >= MINIMUM_LIGHT_THRESHOLD)
+  {
+    itsDarkInHere(LightSensorAnalgValue);
+  }
+}
+
+void itsDarkInHere(int readingValue)
+{
+  Serial.println("its dark in here");
+  sendReading("light", readingValue);
+}
+
+// send reading to server
+void sendReading(String sensorType, int readingValue){
+  StaticJsonDocument<500> doc;
+  doc["reading"] = readingValue;
+  doc["sensorType"] = sensorType;
+  doc["moduleName"] = SENSOR_MODULE_NAME;
+  char jsonString[500];
+  serializeJson(doc, jsonString);
+
+  http.begin(HOST_NAME + READING_PATH_NAME);
+  http.addHeader("Content-Type", "application/json");
+  int httpCode = http.POST(jsonString);
+  if (httpCode > 0)
+  {
+    String payload = http.getString();
+    Serial.println("HTTP Response code: " + String(httpCode));
+    Serial.println("Response payload: " + payload);
+  }
+  else
+  {
+    Serial.println("Error on HTTP request");
+    Serial.println("Response payload: " + http.getString());
+  }
   http.end();
 }

@@ -9,23 +9,37 @@ def get_connection():
     password= 'testing'
 )
 
-def insert_record(reading, reading_type):
-    connection = get_connection()
+def insert_record(reading, reading_type, hardware_name):
+    connection = get_connection()  # Ensure this function returns a valid connection object
     curs = connection.cursor()
 
-    curs.execute(f"INSERT INTO reading (time, reading_type, reading) VALUES('{str(datetime.datetime.now())}','{reading_type}', '{reading}')")
+    # # Check if the reading_type exists in the sensor table
+    # curs.execute("SELECT COUNT(*) FROM sensor WHERE reading_type = %s", (reading_type,))
+    # if curs.fetchone()[0] == 0:
+    #     raise ValueError(f"Invalid reading_type: {reading_type} does not exist in sensor table")
+
+    # # Check if the hardware_name exists in the hardware table
+    # curs.execute("SELECT COUNT(*) FROM hardware WHERE hardware_type = %s", (hardware_name,))
+    # if curs.fetchone()[0] == 0:
+    #     raise ValueError(f"Invalid hardware_name: {hardware_name} does not exist in hardware table")
+
+    # Insert the record into the reading table
+    query = """
+    INSERT INTO reading (time, sensor_type, hardware, reading)
+    VALUES (%s, %s, %s, %s)
+    """
+    curs.execute(query, (datetime.datetime.now(), reading_type, hardware_name, reading))
 
     connection.commit()
-
     curs.close()
     connection.close()
 
-def retrieve_readings(reading_type=None):
+def retrieve_readings(sensor_type=None):
     connection = get_connection()
 
-    if reading_type:
+    if sensor_type:
         curs = connection.cursor()
-        curs.execute(f"SELECT * FROM reading WHERE reading_type = '{reading_type}'")
+        curs.execute(f"SELECT * FROM reading WHERE sensor_type = '{sensor_type}'")
     else:
         curs = connection.cursor()
         curs.execute(f"SELECT * FROM reading")
@@ -40,3 +54,34 @@ def retrieve_readings(reading_type=None):
 #     return json.dumps(readings)
 
     return readings
+
+
+def ensure_hardware(hardware_name):
+    connection = get_connection()
+    curs = connection.cursor()
+
+    # Check if the hardware_name exists
+    curs.execute("SELECT COUNT(*) FROM hardware WHERE hardware_name = %s", (hardware_name,))
+    if curs.fetchone()[0] == 0:
+        # Insert the new hardware_name
+        curs.execute("INSERT INTO hardware (hardware_name) VALUES (%s)", (hardware_name,))
+        print(f"Inserted new hardware: {hardware_name}")
+
+    connection.commit()
+    curs.close()
+    connection.close()
+
+def ensure_sensor(sensor_type):
+    connection = get_connection()
+    curs = connection.cursor()
+
+    # Check if the sensor_type exists
+    curs.execute("SELECT COUNT(*) FROM sensor WHERE sensor_type = %s", (sensor_type,))
+    if curs.fetchone()[0] == 0:
+        # Insert the new sensor_type
+        curs.execute("INSERT INTO sensor (sensor_type) VALUES (%s)", (sensor_type,))
+        print(f"Inserted new sensor type: {sensor_type}")
+
+    connection.commit()
+    curs.close()
+    connection.close()

@@ -7,24 +7,49 @@ app= Flask(__name__)
 def hello_world():
     return '<h1> Hello World! </h1>'
 
-@app.route("/light-reading", methods=["POST"])
+@app.route("/reading", methods=["POST"])
 def recieve_reading():
+    '''
+    {'reading': 1323, 'sensorType': 'light', 'moduleName': 'some_name'}
+    '''
 # print out payload
     data = request.json
     print(data)
-    insert_record(data.get('reading'), data.get('readingType'))
+    insert_record(data.get('reading'), data.get('sensorType'), data.get('moduleName'))
     if not data:
         return "invalid", 400
     return "recieved", 200
 
+@app.route("/standup-hardware", methods=["POST"])
+def standup_hardware():
+    """
+    {
+    "hardwareName":"some_name",
+    "sensorType":["light", "humidity", "pressure", "temperature"]
+    }
+    """
+    try:
+        data = request.json
+        if not data:
+            return jsonify({"error": "No input data provided"}), 400
+
+        hardware_name = data.get('hardwareName')
+        sensor_types = data.get('sensorType')
+
+        if not hardware_name or not sensor_types:
+            return jsonify({"error": "Missing hardwareName or sensorType"}), 400
+
+        ensure_hardware(hardware_name)
+        for sensor in sensor_types:
+            ensure_sensor(sensor)
+
+        return jsonify({"message": "Hardware setup successful"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 @app.route("/review")
 def review():
     readings = retrieve_readings()
-    return jsonify(readings)
-
-@app.route("/review/<reading_type>")
-def review_type(reading_type):
-    readings = retrieve_readings(reading_type)
     return jsonify(readings)
     
 
