@@ -4,7 +4,7 @@
 #include <ArduinoJson.h>
 #include <array>
 
-const String SENSOR_MODULE_NAME = "some_name";
+const String SENSOR_MODULE_NAME = "some_name"; // NAME THIS, all readings FROM this device will be tied to this device.
 
 // wifi settings
 const char WIFI_NAME[] = "Network Name";
@@ -18,9 +18,9 @@ String HARDWARE_PATH_NAME = "/standup-hardware";
 // new http client
 HTTPClient http;
 
+//whatever sensors are implemented should get added to this list for setting up in the DB
 // const String SENSOR_LIST[] = {"light", "humidity", "pressure", "temperature"};
-
-const String SENSOR_LIST[] = {"light"};
+const String SENSOR_LIST[] = {"light"};//currently only have a light sensor
 
 // pin declarations
 int lightSensor = 35; // i35 -> In 35
@@ -33,7 +33,7 @@ void sendHardwarePayload();
 void evaluateLight();
 void itsDarkInHere(int readingValue);
 void lightHasHappened();
-void sendReading(String readingType, int readingValue);
+void sendReading(String readingType, String readingValue);
 
 void setup()
 {
@@ -70,6 +70,61 @@ void setupHardware()
   sendHardwarePayload();
 }
 
+// THIS IS THE MAIN LOOP
+void loop()
+{
+  digitalWrite(ledOut, HIGH);
+  delay(5000); // slow things down a bit
+  evaluateLight();
+  digitalWrite(ledOut, LOW); // turn the pin off
+  delay(5000);               // slow things down a bit
+}
+
+// light reading functions
+void evaluateLight()
+{
+  int LightSensorAnalgValue = analogRead(lightSensor);
+  Serial.printf("Light Value: %d \n", LightSensorAnalgValue);
+
+  if (LightSensorAnalgValue >= MINIMUM_LIGHT_THRESHOLD)
+  {
+    itsDarkInHere(LightSensorAnalgValue);
+  }
+}
+
+void itsDarkInHere(int readingValue)
+{
+  Serial.println("its dark in here");
+  sendReading("light", String(readingValue));
+}
+
+// send reading to server, pass the sensor and the reading
+void sendReading(String sensorType, String readingValue){
+  StaticJsonDocument<500> doc;
+  doc["reading"] = readingValue;
+  doc["sensorType"] = sensorType;
+  doc["moduleName"] = SENSOR_MODULE_NAME;
+  char jsonString[500];
+  serializeJson(doc, jsonString);
+
+  http.begin(HOST_NAME + READING_PATH_NAME);
+  http.addHeader("Content-Type", "application/json");
+  int httpCode = http.POST(jsonString);
+  if (httpCode > 0)
+  {
+    String payload = http.getString();
+    Serial.println("HTTP Response code: " + String(httpCode));
+    Serial.println("Response payload: " + payload);
+  }
+  else
+  {
+    Serial.println("Error on HTTP request");
+    Serial.println("Response payload: " + http.getString());
+  }
+  http.end();
+}
+
+//on init we just check to make sure the DB is setup with references to our sensors.
 void sendHardwarePayload()
 {
   StaticJsonDocument<500> doc;
@@ -101,59 +156,5 @@ void sendHardwarePayload()
     Serial.println("Response payload: " + http.getString());
   }
 
-  http.end();
-}
-
-// THIS IS THE MAIN LOOP
-void loop()
-{
-  digitalWrite(ledOut, HIGH);
-  delay(1000); // slow things down a bit
-  evaluateLight();
-  digitalWrite(ledOut, LOW); // turn the pin off
-  delay(1000);               // slow things down a bit
-}
-
-// light reading functions
-void evaluateLight()
-{
-  int LightSensorAnalgValue = analogRead(lightSensor);
-  Serial.printf("Light Value: %d \n", LightSensorAnalgValue);
-
-  if (LightSensorAnalgValue >= MINIMUM_LIGHT_THRESHOLD)
-  {
-    itsDarkInHere(LightSensorAnalgValue);
-  }
-}
-
-void itsDarkInHere(int readingValue)
-{
-  Serial.println("its dark in here");
-  sendReading("light", readingValue);
-}
-
-// send reading to server
-void sendReading(String sensorType, int readingValue){
-  StaticJsonDocument<500> doc;
-  doc["reading"] = readingValue;
-  doc["sensorType"] = sensorType;
-  doc["moduleName"] = SENSOR_MODULE_NAME;
-  char jsonString[500];
-  serializeJson(doc, jsonString);
-
-  http.begin(HOST_NAME + READING_PATH_NAME);
-  http.addHeader("Content-Type", "application/json");
-  int httpCode = http.POST(jsonString);
-  if (httpCode > 0)
-  {
-    String payload = http.getString();
-    Serial.println("HTTP Response code: " + String(httpCode));
-    Serial.println("Response payload: " + payload);
-  }
-  else
-  {
-    Serial.println("Error on HTTP request");
-    Serial.println("Response payload: " + http.getString());
-  }
   http.end();
 }
