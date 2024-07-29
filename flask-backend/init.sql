@@ -34,4 +34,20 @@ CREATE TABLE reading (
     CONSTRAINT fk_hardware FOREIGN KEY (hardware) REFERENCES hardware (hardware_name)
 );
 
+--  `sudo apt install postgresql`
+
+--  `createuser app_user -P --interactive`
+
+--  `psql`
+
+--  `create database environmentdb`
+
+--  `\connect environmentdb`
+
+--  `CREATE TABLE sensor (sensor_id SERIAL PRIMARY KEY, sensor_type VARCHAR(255) UNIQUE NOT NULL);`
+
+--  `CREATE TABLE hardware (hardware_id SERIAL PRIMARY KEY, hardware_name VARCHAR(255) UNIQUE NOT NULL);`
+
+--  `CREATE TABLE reading (reading_id SERIAL PRIMARY KEY, time TIMESTAMP NOT NULL, sensor_type VARCHAR(255) NOT NULL, hardware VARCHAR(255) NOT NULL, reading VARCHAR(255) NOT NULL, CONSTRAINT fk_sensor_type FOREIGN KEY (sensor_type) REFERENCES sensor (sensor_type), CONSTRAINT fk_hardware FOREIGN KEY (hardware) REFERENCES hardware (hardware_name));`
+
 

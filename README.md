@@ -34,13 +34,14 @@ pass - testing
     - the module or sensor control board (see esp-code/main.cpp) to run the logic
         - all configuration should be at the top of the page, whats there is taylored to MY use case but it should be simple enough to change per-control board
         - ive configured the `ledOut` pin setting to be the on-board pin for my ESP module to act like a heartbeat of sorts. if its off or on forever something is probably wrong but if it blinks slowly its pretty safe to assume nothing is about to catch fire.
-    - BME680 sensor board
-        - this board is for humidity, temperature, and atmospheric pressure
-    - photoresistor
-        - light sensor
+    - photoresistor (light sensor)
+        - [DOCS](https://docs.sunfounder.com/projects/esp32-starter-kit/en/latest/arduino/basic_projects/ar_photoresistor.html)
+
+    - Temp and humidity
+        - [DOCS](https://docs.sunfounder.com/projects/esp32-starter-kit/en/latest/arduino/basic_projects/ar_dht11.html)
 - Grafana
     - charting system available through local portal 
-    - [docs HERE](https://raspberrytips.com/install-grafana-raspberry-pi/)
+    - [DOCS](https://raspberrytips.com/install-grafana-raspberry-pi/)
 
 
 
@@ -50,3 +51,5 @@ pass - testing
 for running openly on local IP
 `$ flask --app flask-backend/app run --host=0.0.0.0`
 
+## there may be additional setup needed for your specific rasberry-pi IP
+ configure everything and then leave the pi running

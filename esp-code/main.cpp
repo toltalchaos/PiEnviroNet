@@ -4,7 +4,7 @@
 #include <ArduinoJson.h>
 #include <array>
 
-const String SENSOR_MODULE_NAME = "some_name"; // NAME THIS, all readings FROM this device will be tied to this device.
+const String SENSOR_MODULE_NAME = "module_01_breadboard"; // NAME THIS, all readings FROM this device will be tied to this device.
 
 // wifi settings
 // const char WIFI_NAME[] = "Network Name";
@@ -22,7 +22,7 @@ HTTPClient http;
 
 //whatever sensors are implemented should get added to this list for setting up in the DB
 // const String SENSOR_LIST[] = {"light", "humidity", "pressure", "temperature"};
-const String SENSOR_LIST[] = {"light"};//currently only have a light sensor
+const String SENSOR_LIST[] = {"light"}; //currently only have a light sensor
 
 // pin declarations
 int lightSensor = 35; // i35 -> In 35
@@ -64,11 +64,16 @@ void setup() {
 // THIS IS THE MAIN LOOP
 void loop()
 {
+  //it might be useful to split this up a little in the future?
+  delay(120000); // slow things down a bit
   digitalWrite(ledOut, HIGH);
-  delay(5000); // slow things down a bit
+
+// do readings
   evaluateLight();
+
+
+  delay(120000);// slow things down a bit
   digitalWrite(ledOut, LOW); // turn the pin off
-  delay(5000);               // slow things down a bit
 }
 
 // light reading functions
@@ -80,7 +85,7 @@ void evaluateLight()
   if (LightSensorAnalgValue >= MINIMUM_LIGHT_THRESHOLD)
   {
     Serial.println("its dark in here");
-   sendReading("light", String(LightSensorAnalgValue));
+   sendReading(SENSOR_LIST[0], String(LightSensorAnalgValue));
   }
 }
 
@@ -129,7 +134,7 @@ void evaluateHttpResponse(int httpCode){
         Serial.println(payload);
       }
   } else {
-      Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
+      Serial.printf("[HTTP] ... failed, error: %s\n", http.errorToString(httpCode).c_str());
   } 
   http.end();
 }
