@@ -18,7 +18,7 @@ def insert_record(reading, reading_type, hardware_name):
     INSERT INTO reading (time, sensor_type, hardware, reading)
     VALUES (%s, %s, %s, %s)
     """
-    curs.execute(query, (datetime.datetime.now(), reading_type, hardware_name, reading))
+    curs.execute(query, (datetime.datetime.utcnow(), reading_type, hardware_name, reading))
 
     connection.commit()
     curs.close()
