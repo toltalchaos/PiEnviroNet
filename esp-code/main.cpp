@@ -28,8 +28,6 @@ const String SENSOR_LIST[] = {"light"}; //currently only have a light sensor
 int lightSensor = 35; // i35 -> In 35
 int ledOut = 2;       // IO2 -> pin2 (onboard LED)
 
-const int MINIMUM_LIGHT_THRESHOLD = 300;
-
 void sendHardwarePayload();
 void evaluateLight();
 void sendReading(String readingType, String readingValue);
@@ -82,11 +80,8 @@ void evaluateLight()
   int LightSensorAnalgValue = analogRead(lightSensor);
   Serial.printf("Light Value: %d \n", LightSensorAnalgValue);
 
-  if (LightSensorAnalgValue >= MINIMUM_LIGHT_THRESHOLD)
-  {
-    Serial.println("its dark in here");
-   sendReading(SENSOR_LIST[0], String(LightSensorAnalgValue));
-  }
+  Serial.println("its dark in here");
+  sendReading(SENSOR_LIST[0], String(LightSensorAnalgValue));
 }
 
 // send reading to server, pass the sensor and the reading

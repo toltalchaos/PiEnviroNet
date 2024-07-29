@@ -40,6 +40,11 @@ pass - testing
     - Temp and humidity
         - [DOCS](https://docs.sunfounder.com/projects/esp32-starter-kit/en/latest/arduino/basic_projects/ar_dht11.html)
 - Grafana
+    - `sudo /bin/systemctl start grafana-server`
+    - `sudo /bin/systemctl status grafana-server` to ensure it is running
+    - `http://<pis local ip>:3000`
+    - default user-pass (admin-admin)
+    - dont worry too much just setup a connection with `localhost` and the application username and password
     - charting system available through local portal 
     - [DOCS](https://raspberrytips.com/install-grafana-raspberry-pi/)
 
