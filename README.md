@@ -37,8 +37,10 @@ pass - testing
     - photoresistor (light sensor)
         - [DOCS](https://docs.sunfounder.com/projects/esp32-starter-kit/en/latest/arduino/basic_projects/ar_photoresistor.html)
 
-    - Temp and humidity
+    - Temp and humidity (DH11 chip)
         - [DOCS](https://docs.sunfounder.com/projects/esp32-starter-kit/en/latest/arduino/basic_projects/ar_dht11.html)
+    - Temp, Pressure, altitude, humidity (BME680 chip)
+        - [DOCS](https://randomnerdtutorials.com/esp32-bme680-sensor-arduino/)
 - Grafana
     - `sudo /bin/systemctl start grafana-server`
     - `sudo /bin/systemctl status grafana-server` to ensure it is running
