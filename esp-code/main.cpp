@@ -130,7 +130,7 @@ void evaluateAtmosphere(){
   Serial.print(F("Humidity = "));
   Serial.print(bme.humidity);
   Serial.println(F(" %"));
-  sendReading(SENSOR_LIST[1], String(bme.pressure));
+  sendReading(SENSOR_LIST[1], String(bme.humidity));
 
 
   Serial.print(F("Gas = "));
