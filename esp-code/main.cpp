@@ -28,7 +28,7 @@ String HARDWARE_PATH_NAME = "/standup-hardware";
 HTTPClient http;
 
 //whatever sensors are implemented should get added to this list for setting up in the DB
-const String SENSOR_LIST[] = {"light", "humidity", "pressure", "temperature"};
+const String SENSOR_LIST[] = {"light", "humidity", "pressure", "temperature", "gas"};
 
 // pin declarations
 int lightSensor = 35; // i35 -> In 35
@@ -136,6 +136,8 @@ void evaluateAtmosphere(){
   Serial.print(F("Gas = "));
   Serial.print(bme.gas_resistance / 1000.0);
   Serial.println(F(" KOhms"));
+  sendReading(SENSOR_LIST[4], String(bme.gas_resistance));
+
 
   Serial.print(F("Approx. Altitude = "));
   Serial.print(bme.readAltitude(SEALEVELPRESSURE_HPA));
