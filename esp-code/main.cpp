@@ -11,13 +11,13 @@
 
 Adafruit_BME680 bme; // I2C default ESP32 I2C pins: GPIO 22 (SCL), GPIO 21 (SDA).
 
-const String SENSOR_MODULE_NAME = "module_01_breadboard"; // NAME THIS, all readings FROM this device will be tied to this device.
+const String SENSOR_MODULE_NAME = "module_02_wiring_harness"; // NAME THIS, all readings FROM this device will be tied to this device.
 
 // wifi settings
 // const char WIFI_NAME[] = "Network Name";
-// const char WIFI_PASSWORD[] = "vjpz8446";
-const char WIFI_NAME[] = "TELUSWiFi3462";
-const char WIFI_PASSWORD[] = "7M8B7zdVH7";
+// const char WIFI_PASSWORD[] = "password";
+const char WIFI_NAME[] = "";
+const char WIFI_PASSWORD[] = "";
 
 // server connection settings
 String HOST_NAME = "http://192.168.1.81:8080"; // unless this is pinned it will likely change
