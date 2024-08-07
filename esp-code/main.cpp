@@ -15,12 +15,12 @@ const String SENSOR_MODULE_NAME = "module_02_wiring_harness"; // NAME THIS, all 
 
 // wifi settings
 // const char WIFI_NAME[] = "Network Name";
-// const char WIFI_PASSWORD[] = "password";
-const char WIFI_NAME[] = "";
-const char WIFI_PASSWORD[] = "";
+// const char WIFI_PASSWORD[] = "vjpz8446";
+const char WIFI_NAME[] = "TELUSWiFi3462";
+const char WIFI_PASSWORD[] = "7M8B7zdVH7";
 
 // server connection settings
-String HOST_NAME = "http://192.168.1.81:8080"; // unless this is pinned it will likely change
+String HOST_NAME = "nameofyour-pi.local:8080"; // unless this is pinned it will likely change
 String READING_PATH_NAME = "/reading";
 String HARDWARE_PATH_NAME = "/standup-hardware";
 
