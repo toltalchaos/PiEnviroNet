@@ -60,3 +60,25 @@ for running openly on local IP
 
 ## there may be additional setup needed for your specific rasberry-pi IP
  configure everything and then leave the pi running
+
+
+ ## RUNNING FLASK IN DOCKER
+  [DOCS](https://raspberrytips.com/docker-on-raspberry-pi/)
+  the benifits of this is so you can ssh in from a remote and see whats going on without having to disturb or run in any kind of debug mode
+
+  first we need to setup docker, the above docs should help. then we need to execute the following
+
+  - `docker ps` to see we have no running images
+  - `cd flask-backend` to get to our flask directory
+  - ` docker build -t enviro-flask` to build an image ready for running tagged as "enviro-flask"
+  - `docker images` to see our new image
+  - `docker run -d -p 8080:8080 enviro-flask` run our docker image in the background to be exposed on port 8080
+  - `docker ps` to see the newly running image. you should be able to ping the `rasberrypi.local:8080` endpoint to see the welcome page in the flask app.
+
+  - `docker logs [image num]` to view logs
+  - `docker stop [image num]` to kill the container
+
+
+
+### updating 
+to update you just need to build and run a new image.
