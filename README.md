@@ -70,10 +70,9 @@ for running openly on local IP
 
   - `docker ps` to see we have no running images
   - `cd flask-backend` to get to our flask directory
-  - ` docker build -t enviro-flask` to build an image ready for running tagged as "enviro-flask"
-  - `docker images` to see our new image
-  - `docker run -d -p 8080:8080 enviro-flask` run our docker image in the background to be exposed on port 8080
+  - ` docker compose up -d` to build the docker-compose yaml this creates the postgres DB and flask application
   - `docker ps` to see the newly running image. you should be able to ping the `rasberrypi.local:8080` endpoint to see the welcome page in the flask app.
+  - `docker compose down` to kill everything
 
   - `docker logs [image num]` to view logs
   - `docker stop [image num]` to kill the container
