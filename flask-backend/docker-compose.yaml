@@ -23,4 +23,5 @@ services:
       - ./data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
-      - 5432:5432
+    # Expose port 5432 to container (pg default) and use 6000 to connect to the database from the outside to avoid conflicts
+      - 6000:5432
