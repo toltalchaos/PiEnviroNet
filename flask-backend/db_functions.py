@@ -1,13 +1,10 @@
 import psycopg2
 import datetime
+import os
 
 def get_connection():
-    return psycopg2.connect(
-    host='localhost',
-    database='environmentdb',
-    user= 'app_user',
-    password= 'testing'
-)
+    database_url = os.environ.get('DATABASE_URL')
+    return psycopg2.connect(database_url)
 
 def insert_record(reading, reading_type, hardware_name):
     connection = get_connection()  # Ensure this function returns a valid connection object

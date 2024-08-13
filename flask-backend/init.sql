@@ -11,19 +11,19 @@
 -- \connect environmentdb;
 
 -- Create the tables
-CREATE TABLE sensor (
+CREATE TABLE IF NOT EXISTS sensor (
     sensor_id SERIAL PRIMARY KEY,  -- Primary key for the sensor table
     sensor_type VARCHAR(255) UNIQUE NOT NULL  -- Column to be referenced by foreign key
 );
 
 
-CREATE TABLE hardware (
+CREATE TABLE IF NOT EXISTS  hardware (
     hardware_id SERIAL PRIMARY KEY,  -- Primary key for the hardware table
     hardware_name VARCHAR(255) UNIQUE NOT NULL  -- Column to be referenced by foreign key
 );
 
 
-CREATE TABLE reading (
+CREATE TABLE IF NOT EXISTS  reading (
     reading_id SERIAL PRIMARY KEY,  -- Primary key for the reading table
     time TIMESTAMP NOT NULL,  -- Assuming time is a timestamp
     sensor_type VARCHAR(255) NOT NULL,
