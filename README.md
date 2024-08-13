@@ -78,6 +78,7 @@ for running openly on local IP
   - `docker stop [image num]` to kill the container
 
 
+    - connect to the docker postgres with `psql -h localhost -p 6000 -U postgres` password postgres
 
 ### updating 
 to update you just need to build and run a new image.
