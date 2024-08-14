@@ -9,26 +9,12 @@ this app is for an ESP32 module to send data (main.cpp) for a light sensor to a 
     - the data storage vehicle for the long term data
     - need to setup the following locally! (see init.sql)
     - if you want to run your database on an external HDD [HERE](https://dba.stackexchange.com/questions/283845/postgresql-on-external-hd) is a good resource on how to do that. just ensure the connection works as expected for the flask app in db_functions.py (get_connection())
+    - also, if using a docker container with the below docker instructions be sure to have THIS repo where you want the data for the database as the volume library will be contained inside /flask-backend/data/
 
-postgres db - environmentdb
-user - app_user
-pass - testing
+postgres db - mydatabase
+user - postgres
+pass - password
 
- `sudo apt install postgresql`
-
- `createuser app_user -P --interactive`
-
- `psql`
-
- `create database environmentdb`
-
- `\connect environmentdb`
-
- `CREATE TABLE sensor (sensor_id SERIAL PRIMARY KEY, sensor_type VARCHAR(255) UNIQUE NOT NULL);`
-
- `CREATE TABLE hardware (hardware_id SERIAL PRIMARY KEY, hardware_name VARCHAR(255) UNIQUE NOT NULL);`
-
- `CREATE TABLE reading (reading_id SERIAL PRIMARY KEY, time TIMESTAMP NOT NULL, sensor_type VARCHAR(255) NOT NULL, hardware VARCHAR(255) NOT NULL, reading VARCHAR(255) NOT NULL, CONSTRAINT fk_sensor_type FOREIGN KEY (sensor_type) REFERENCES sensor (sensor_type), CONSTRAINT fk_hardware FOREIGN KEY (hardware) REFERENCES hardware (hardware_name));`
 
 - ESP32/arduino
     - the module or sensor control board (see esp-code/main.cpp) to run the logic
@@ -46,9 +32,11 @@ pass - testing
     - `sudo /bin/systemctl status grafana-server` to ensure it is running
     - `http://<pis local ip>:3000`
     - default user-pass (admin-admin)
-    - dont worry too much just setup a connection with `localhost` and the application username and password
+    - dont worry too much just setup a connection with `localhost:6000` and the application username and password
+    ![configuration image](image.png)
     - charting system available through local portal 
     - [DOCS](https://raspberrytips.com/install-grafana-raspberry-pi/)
+
 
 
 
@@ -57,9 +45,6 @@ pass - testing
 
 for running openly on local IP
 `$ flask --app flask-backend/app run --host=0.0.0.0`
-
-## there may be additional setup needed for your specific rasberry-pi IP
- configure everything and then leave the pi running
 
 
  ## RUNNING FLASK IN DOCKER
@@ -79,6 +64,3 @@ for running openly on local IP
 
 
     - connect to the docker postgres with `psql -h localhost -p 6000 -U postgres` password postgres
-
-### updating 
-to update you just need to build and run a new image.
