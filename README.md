@@ -1,66 +1,89 @@
+
 # PiEnviroNet
-this app is for an ESP32 module to send data (main.cpp) for a light sensor to a database for later review!
 
-## Components:
-- Flask API
-    - this server is the running entryway for the ESP32 module to send data to and have it stored in the postgres db
+**PiEnviroNet** is an application designed to collect data from an ESP32 module equipped with various sensors, storing this data in a PostgreSQL database. The data can then be reviewed using a locally hosted Grafana server. This application is designed for easy setup and operation, including Docker support for lightweight deployment across a Local Area Network (LAN).
 
-- Postgres DB
-    - the data storage vehicle for the long term data
-    - need to setup the following locally! (see init.sql)
-    - if you want to run your database on an external HDD [HERE](https://dba.stackexchange.com/questions/283845/postgresql-on-external-hd) is a good resource on how to do that. just ensure the connection works as expected for the flask app in db_functions.py (get_connection())
-    - also, if using a docker container with the below docker instructions be sure to have THIS repo where you want the data for the database as the volume library will be contained inside /flask-backend/data/
+## Key Components
 
-postgres db - mydatabase
-user - postgres
-pass - password
+### 1. Flask API
+The Flask API acts as a server, receiving data from the ESP32 module and storing it in a PostgreSQL database.
 
+### 2. PostgreSQL Database
+The PostgreSQL database is used to store sensor data for long-term analysis.
 
-- ESP32/arduino
-    - the module or sensor control board (see esp-code/main.cpp) to run the logic
-        - all configuration should be at the top of the page, whats there is taylored to MY use case but it should be simple enough to change per-control board
-        - ive configured the `ledOut` pin setting to be the on-board pin for my ESP module to act like a heartbeat of sorts. if its off or on forever something is probably wrong but if it blinks slowly its pretty safe to assume nothing is about to catch fire.
-    - photoresistor (light sensor)
-        - [DOCS](https://docs.sunfounder.com/projects/esp32-starter-kit/en/latest/arduino/basic_projects/ar_photoresistor.html)
+- **Setup Instructions:**
+    - Follow the instructions in `init.sql` to set up the database locally.
+    - If you prefer to run your database on an external hard drive, refer to [this resource](https://dba.stackexchange.com/questions/283845/postgresql-on-external-hd). Ensure that the database connection is properly configured in `db_functions.py` (`get_connection()`).
+    - If using Docker, place this repository in the desired location for database storage. The volume library will be located in `/flask-backend/data/`.
 
-    - Temp and humidity (DH11 chip)
-        - [DOCS](https://docs.sunfounder.com/projects/esp32-starter-kit/en/latest/arduino/basic_projects/ar_dht11.html)
-    - Temp, Pressure, altitude, humidity (BME680 chip)
-        - [DOCS](https://randomnerdtutorials.com/esp32-bme680-sensor-arduino/)
-- Grafana
+- **Database Credentials:**
+    - **Database Name:** mydatabase
+    - **Username:** postgres
+    - **Password:** password
+
+### 3. ESP32/Arduino
+The ESP32 module is used to run the sensor logic.
+
+- **Configuration:**
+    - Configuration options are located at the top of `esp-code/main.cpp`. The provided settings are tailored to a specific use case but can be easily modified.
+    - The `ledOut` pin is configured to act as a heartbeat indicator. A blinking LED signifies normal operation, while a constant on or off state may indicate an issue.
+
+- **Supported Sensors:**
+    - **Light Sensor (Photoresistor):** [Documentation](https://docs.sunfounder.com/projects/esp32-starter-kit/en/latest/arduino/basic_projects/ar_photoresistor.html)
+    - **Temperature & Humidity Sensor (DH11):** [Documentation](https://docs.sunfounder.com/projects/esp32-starter-kit/en/latest/arduino/basic_projects/ar_dht11.html)
+    - **Temperature, Pressure, Altitude & Humidity Sensor (BME680):** [Documentation](https://randomnerdtutorials.com/esp32-bme680-sensor-arduino/)
+
+### 4. Grafana
+Grafana is used for visualizing the data collected by the sensors.
+
+- **Start Grafana Server:**
     - `sudo /bin/systemctl start grafana-server`
-    - `sudo /bin/systemctl status grafana-server` to ensure it is running
-    - `http://<pis local ip>:3000`
-    - default user-pass (admin-admin)
+    - Check status with `sudo /bin/systemctl status grafana-server`
+    - Access Grafana at `http://<pi's local IP>:3000`
+  
+- **Default Login:**
+    - **Username:** admin
+    - **Password:** admin
+  
+- **Setup:**
+    - Set up a connection with `localhost:6000` using the application’s username and password.
+    - Additional setup instructions can be found in this [guide](https://raspberrytips.com/install-grafana-raspberry-pi/).
+
     - dont worry too much just setup a connection with `localhost:6000` and the application username and password
     ![configuration image](image.png)
-    - charting system available through local portal 
-    - [DOCS](https://raspberrytips.com/install-grafana-raspberry-pi/)
 
+## Running the Flask App
 
+To start the Flask app locally, use the following command:
 
+```sh
+$ flask --app flask-backend/app run
+```
 
-## run flask app
-`$ flask --app flask-backend/app run`
+To run the Flask app openly on your local IP address, use:
 
-for running openly on local IP
-`$ flask --app flask-backend/app run --host=0.0.0.0`
+```sh
+$ flask --app flask-backend/app run --host=0.0.0.0
+```
 
+## Running Flask in Docker
 
- ## RUNNING FLASK IN DOCKER
-  [DOCS](https://raspberrytips.com/docker-on-raspberry-pi/)
-  the benifits of this is so you can ssh in from a remote and see whats going on without having to disturb or run in any kind of debug mode
+Docker allows you to manage and run the application in a lightweight, containerized environment.
 
-  first we need to setup docker, the above docs should help. then we need to execute the following
+- **Setup Docker:** Follow [this guide](https://raspberrytips.com/docker-on-raspberry-pi/) to set up Docker.
+- **Running the Application:**
+    1. Check for running Docker images: `docker ps`
+    2. Navigate to the Flask directory: `cd flask-backend`
+    3. Build and start the Docker containers: `docker compose up -d`
+    4. Verify the running image: `docker ps` (You should be able to access the Flask app at `rasberrypi.local:8080`)
+    5. Stop the containers: `docker compose down`
 
-  - `docker ps` to see we have no running images
-  - `cd flask-backend` to get to our flask directory
-  - ` docker compose up -d` to build the docker-compose yaml this creates the postgres DB and flask application
-  - `docker ps` to see the newly running image. you should be able to ping the `rasberrypi.local:8080` endpoint to see the welcome page in the flask app.
-  - `docker compose down` to kill everything
+- **Managing Docker:**
+    - View logs: `docker logs [image ID]`
+    - Stop a container: `docker stop [image ID]`
 
-  - `docker logs [image num]` to view logs
-  - `docker stop [image num]` to kill the container
-
-
-    - connect to the docker postgres with `psql -h localhost -p 6000 -U postgres` password postgres
+- **Connect to the PostgreSQL Database in Docker:**
+    ```sh
+    psql -h localhost -p 6000 -U postgres
+    ```
+    - **Password:** postgres
